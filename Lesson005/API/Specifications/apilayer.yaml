@@ -1,0 +1,300 @@
+openapi: 3.0.0
+info:
+  title: APILayer
+  version: 0.0.1
+servers: 
+  - url: https://api.apilayer.com
+    description: APILayer server
+paths:
+  /world_news/search-news:
+    get:
+      tags: 
+        - Search-news
+      summary: search news
+      operationId: getNewsList
+      parameters:
+      - name: apiKey
+        in: header
+        description: API key
+        required: true
+        schema:
+          type: string
+      - name: authors
+        in: query
+        description: A comma-separated list of author names. Only news from any of the given authors will be returned.
+        required: false
+        schema:
+          type: string
+      - name: earliest-publish-date
+        in: query
+        description: The news must have been published after this date.
+        required: false
+        schema:
+          type: string
+      - name: entities
+        in: query
+        description: Filter news by entities, e.g. ORG:Tesla.
+        required: false
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: The ISO 6391 language code of the news, e.g. "en" for English.
+        required: false
+        schema:
+          type: string
+      - name: latest-publish-date
+        in: query
+        description: The news must have been published before this date.
+        required: false
+        schema:
+          type: string
+      - name: location-filter
+        in: query
+        description: Filter news by radius around a certain location. Format is "latitude,longitude,radius in kilometers", e.g. 51.050407, 13.737262, 100
+        required: false
+        schema:
+          type: string
+      - name: max-sentiment
+        in: query
+        description: The maximal sentiment of the news in range [-1,1].
+        required: false
+        schema:
+          type: string
+      - name: min-sentiment
+        in: query
+        description: The minimal sentiment of the news in range [-1,1].
+        required: false
+        schema:
+          type: string
+      - name: news-sources
+        in: query
+        description: A comma-separated list of news sources from which the news should originate, e.g. https://www.bbc.co.uk
+        required: false
+        schema:
+          type: string
+      - name: number
+        in: query
+        description: The number of news to return in range [1,100]
+        required: false
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: The number of news to skip in range [0,1000]
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: The sorting criteria. (publish-time or sentiment)
+        required: false
+        schema:
+          type: string
+      - name: sort-direction
+        in: query
+        description: Whether to sort asc or desc.
+        required: false
+        schema:
+          type: string
+      - name: source-countries
+        in: query
+        description: A comma-separated list of ISO 3166 country codes from which the news should originate, e.g. uk,us.
+        required: false
+        schema:
+          type: string
+      - name: text
+        in: query
+        description: The text to match in the news content.
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsList'
+        default:
+          description: enexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /world_news/geo-coordinates:
+    get:
+      tags: 
+        - Geo-coordinates
+      summary: geo coordinates
+      operationId: getGeoCoordinates
+      parameters:
+      - name: apiKey
+        in: header
+        description: API key
+        required: true
+        schema:
+          type: string
+      - name: location 
+        in: query
+        description: The address or name of the location.
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoCoordinates'
+        default:
+          description: enexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+  /world_news/extract-news:
+    get:
+      tags: 
+        - Extract-news
+      summary: extract news
+      operationId: getExtractNews
+      parameters:
+      - name: apiKey
+        in: header
+        description: API key
+        required: true
+        schema:
+          type: string
+      - name: analyze
+        in: query
+        description: Whether to analyze the news.
+        required: true
+        schema:
+          type: string
+      - name: url
+        in: query
+        description: Source url.
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractNews'
+        default:
+          description: enexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorModel'
+components:
+  schemas:
+    ExtractNews:
+      type: object
+      properties:
+        author:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Entitie'
+        image:
+          type: string
+        language:
+          type: string
+        publish_date:
+          type: string
+        sentiment:
+          type: number
+        text:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+    Entitie:
+      type: object
+      properties:
+        description:
+          type: string
+        full_name:
+          type: string
+        image:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        latitude:
+          type: number
+        location_type:
+          type: string
+        longitude:
+          type: number
+    GeoCoordinates:
+      type: object
+      properties:
+        city:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+    NewsList:
+      type: object
+      properties:
+        available:
+          type: integer
+        news:
+          type: array
+          items:
+            $ref: '#/components/schemas/News'
+        number:
+          type: integer
+        offset:
+          type: integer
+    ErrorModel:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          maximum: 600
+          minimum: 100
+          type: integer
+    News:
+      type: object
+      properties:
+        author:
+          type: string
+        authors:
+          type: array
+          items:
+            type: string
+        id:
+          type: integer
+        image:
+          type: string
+        language:
+          type: string
+        publish_date: 
+          type: string
+        sentiment:
+          type: number
+        source_country:
+          type: string
+        summary:
+          type: string
+        text:
+          type: string
+        url:
+          type: string
+        video:
+          type: string
+        title:
+          type: string

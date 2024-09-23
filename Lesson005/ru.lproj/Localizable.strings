@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  Lesson005
+
+  Created by Петр Постников on 22.09.2024.
+  
+*/
+
+// MARK: Общее
+"common-empty" = "";
+"common-sport" = "Спорт";
+"common-fashion" = "Мода";
+"common-criminal" = "Криминал";
